@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheetsa } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 const Dashboard = () => {
-    const navigation: any = useNavigation();
+    const navigation = useNavigation();
     const handleHome = () => {
-        navigation.navigate('Details')
+        navigation.navigate('Searching')
     }
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={handleHome}>
                 <Text style={styles.text}>Dashboard</Text>
+                
             </TouchableOpacity>
         </View>
     );

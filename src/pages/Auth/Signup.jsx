@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../../components/colors';
 
 const Signup = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -127,21 +128,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F3F6',
+    backgroundColor: Colors.backgroundLight,
   },
   innerContainer: {
     width: '90%',
     padding: 25,
     shadowRadius: 4,
     shadowOpacity: 0.25,
-    backgroundColor: 'white',
+    backgroundColor: Colors.surfaceLight,
     alignItems: 'center',
     elevation: 5,
   },
   title: {
     fontSize: 30,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: Colors.textDark,
     marginBottom: 40,
   },
   inputField: {
@@ -150,15 +151,15 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: '#2C3E50',
+    color: Colors.textDark,
   },
   input: {
-    borderBottomColor: '#2980B9',
+    borderBottomColor: Colors.accent ,  
     borderBottomWidth: 1,
     paddingVertical: 8,
     marginTop: 5,
     fontSize: 16,
-    color: '#2C3E50',
+    color: Colors.textDark,
     textAlignVertical: 'center',
     letterSpacing: 0.5,
     paddingHorizontal: 8,
@@ -166,14 +167,14 @@ const styles = StyleSheet.create({
   loginText: {
     marginTop: 20,
     fontSize: 16,
-    color: '#7F8C8D',
+    color: Colors.textDark,
   },
   loginLink: {
-    color: '#2980B9',
+    color: Colors.accent, 
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#2980B9',
+    backgroundColor: Colors.accent,  
     paddingVertical: 12,
     paddingHorizontal: 60,
     borderRadius: 8,
@@ -183,12 +184,13 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: Colors.textLight,
   },
   errorText: {
-    color: 'red',  // Red color for error message
+    color: 'red',  
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',
   },
 });
+

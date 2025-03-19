@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../../components/colors';
 
 const ForgotPassword = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: 'black',
     marginBottom: 40,
   },
   inputField: {
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
   },
   input: {
-    borderBottomColor: '#2980B9',
+    borderBottomColor: Colors.accent,
     borderBottomWidth: 1,
     paddingVertical: 8,
     marginTop: 5,
@@ -161,11 +162,11 @@ const styles = StyleSheet.create({
     color: '#7F8C8D',
   },
   loginLink: {
-    color: '#2980B9',
+    color: Colors.accent,
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#2980B9',
+    backgroundColor: Colors.accent,
     paddingVertical: 12,
     paddingHorizontal: 60,
     borderRadius: 8,
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   errorText: {
-    color: 'red',  // Red color for error message
+    color: Colors.error,  // Red color for error message
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',

@@ -6,6 +6,8 @@ import Login from './src/pages/Auth/Login';
 import ForgotPassword from './src/pages/Auth/ForgotPassword';
 import ResetPasswprd from './src/pages/Auth/ResetPassword';
 import Dashboard from './src/pages/Auth/Dashboard';
+import Searching from './src/pages/home/Searching';
+import Setting from './src/pages/home/Setting';
 
 
 const Stack = createNativeStackNavigator();
@@ -13,11 +15,13 @@ const App = () => {
   return (
     <NavigationContainer>
     <Stack.Navigator initialRouteName="Signup">
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Signup" component={Setting} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       <Stack.Screen name="ResetPassword" component={ResetPasswprd} />
       <Stack.Screen name="Dashboard" component={Dashboard} />
+      <Stack.Screen name="Searching" component={Searching} />
+      <Stack.Screen name="Setting" component={Setting} />
     </Stack.Navigator>
   </NavigationContainer>
   )
