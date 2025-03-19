@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 const Home = () => {
-    const navigation: any = useNavigation();
+    const navigation = useNavigation();
     const handleHome = () => {
-        navigation.navigate('Details')
+        navigation.navigate('Profile')
     }
     return (
         <View style={styles.container}>
@@ -29,3 +29,17 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
+
+
+
+// import React from 'react';
+// import SwiperTest from './SwiperTest'; // Import the SwiperTest component
+
+// const Home = () => {
+//   return (
+//     <SwiperTest />
+//   );
+// };
+
+// export default Home;
+
