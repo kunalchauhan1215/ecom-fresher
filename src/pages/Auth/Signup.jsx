@@ -1,6 +1,8 @@
+// Signup.jsx
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomTextInput from '../../components/CustomTextInput';
 
 const Signup = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -9,11 +11,9 @@ const Signup = ({ navigation }) => {
     Password: '',
   });
 
-  //states to handle errors
-  const [error, setError] = useState('');  
+  const [error, setError] = useState('');
   const { Username, Email, Password } = formData;
 
-  // Create refs for the input fields
   const emailInputRef = React.createRef();
   const passwordInputRef = React.createRef();
 
@@ -25,20 +25,29 @@ const Signup = ({ navigation }) => {
   };
 
   const isCheckValid = async () => {
-    setError('');  // Clear previous errors before validating
+    setError('');
 
-    // Validate that all fields are filled out
     if (!Username.trim() || !Email.trim() || !Password.trim()) {
       setError('Please enter all the details.');
-      return; // Exit if validation fails
+      return;
     }
 
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3,}$/;
+  if (!emailRegex.test(Email)) {
+    setError('Please enter a valid email address.');
+    return;
+  }
+
+  // Regex for Password validation
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+  if (!passwordRegex.test(Password)) {
+    setError('Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, and one number.');
+    return;
+  }
+
     try {
-      // Store user data in AsyncStorage
       await AsyncStorage.setItem('userData', JSON.stringify(formData));
       console.log('User data saved to AsyncStorage');
-
-      // Navigate to Login screen
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error saving data to AsyncStorage:', error);
@@ -47,63 +56,43 @@ const Signup = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior= "padding"
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
           <Text style={styles.title}>Signup</Text>
 
-          {/* Username Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Username</Text>
-            <TextInput
-              placeholder="Enter your Username"
-              placeholderTextColor="gray"
-              style={styles.input}
-              value={Username}
-              onChangeText={(value) => handleInputChange('Username', value)}
-              returnKeyType="next"
-              onSubmitEditing={() => emailInputRef.current.focus()}  // Move to Email field
-            />
-          </View>
+          <CustomTextInput
+            label="Username"
+            value={Username}
+            onChangeText={(value) => handleInputChange('Username', value)}
+            placeholder="Enter your Username"
+            returnKeyType="next"
+            onSubmitEditing={() => emailInputRef.current.focus()}
+          />
 
-          {/* Email Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              ref={emailInputRef} // Ref for Email input
-              placeholder="Enter your Email"
-              placeholderTextColor="gray"
-              style={styles.input}
-              value={Email}
-              onChangeText={(value) => handleInputChange('Email', value)}
-              returnKeyType="next"
-              onSubmitEditing={() => passwordInputRef.current.focus()}  // Move to Password field
-            />
-          </View>
+          <CustomTextInput
+            label="Email"
+            value={Email}
+            onChangeText={(value) => handleInputChange('Email', value)}
+            placeholder="Enter your Email"
+            returnKeyType="next"
+            inputRef={emailInputRef}
+            onSubmitEditing={() => passwordInputRef.current.focus()}
+          />
 
-          {/* Password Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <TextInput
-              ref={passwordInputRef} // Ref for Password input
-              placeholder="Enter your Password"
-              placeholderTextColor="gray"
-              style={styles.input}
-              secureTextEntry={true}
-              value={Password}
-              onChangeText={(value) => handleInputChange('Password', value)}
-              returnKeyType="done"
-              onSubmitEditing={isCheckValid}  // Call the submit function
-            />
-          </View>
+          <CustomTextInput
+            label="Password"
+            value={Password}
+            onChangeText={(value) => handleInputChange('Password', value)}
+            placeholder="Enter your Password"
+            secureTextEntry={true}
+            inputRef={passwordInputRef}
+            returnKeyType="done"
+            onSubmitEditing={isCheckValid}
+          />
 
-          {/* Display Error Message */}
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
-          {/* Signup Button */}
           <TouchableOpacity style={styles.button} onPress={isCheckValid}>
             <Text style={styles.buttonText}>Signup</Text>
           </TouchableOpacity>
@@ -127,53 +116,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F3F6',
+    backgroundColor: '#E5D9F2',
   },
   innerContainer: {
     width: '90%',
     padding: 25,
     shadowRadius: 4,
     shadowOpacity: 0.25,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     elevation: 5,
   },
   title: {
     fontSize: 30,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: '#6A0DAD',
     marginBottom: 40,
   },
-  inputField: {
-    marginVertical: 12,
-    width: '100%',
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
-  },
-  input: {
-    borderBottomColor: '#2980B9',
-    borderBottomWidth: 1,
-    paddingVertical: 8,
-    marginTop: 5,
-    fontSize: 16,
-    color: '#2C3E50',
-    textAlignVertical: 'center',
-    letterSpacing: 0.5,
-    paddingHorizontal: 8,
-  },
+  
   loginText: {
     marginTop: 20,
     fontSize: 16,
     color: '#7F8C8D',
   },
   loginLink: {
-    color: '#2980B9',
+    color: '#9B59B6',
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#2980B9',
+    backgroundColor: '#9B59B6',
     paddingVertical: 12,
     paddingHorizontal: 60,
     borderRadius: 8,
@@ -186,7 +157,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   errorText: {
-    color: 'red',  // Red color for error message
+    color: '#FF6347',
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',

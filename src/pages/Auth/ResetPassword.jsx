@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomTextInput from '../../components/CustomTextInput';
 
 const ResetPassword = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -27,6 +28,13 @@ const ResetPassword = ({ navigation }) => {
       return;
     }
 
+  // Regex for Password validation
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+  if (!passwordRegex.test(NewPassword)) {
+    setError('Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, and one number.');
+    return;
+  }
+    
     if (NewPassword !== ConfirmPassword) {
       setError('Passwords do not match. Please re-enter the passwords correctly.');
       return;
@@ -34,6 +42,7 @@ const ResetPassword = ({ navigation }) => {
 
     try {
       const storedData = await AsyncStorage.getItem('userData');
+      console.log('Stored data:', storedData);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         parsedData.Password = NewPassword;
@@ -54,45 +63,40 @@ const ResetPassword = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
           <Text style={styles.title}>Reset Password</Text>
 
-          {/* New Password Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>New Password</Text>
-            <TextInput
-              placeholder="Enter your New Password"
-              placeholderTextColor="gray"
-              style={styles.input}
-              secureTextEntry={true}
-              value={NewPassword}
-              onChangeText={(value) => handleInputChange('NewPassword', value)}
-              returnKeyType="next"
-              onSubmitEditing={() => ReEnterpasswordInputRef.current.focus()}
-            />
-          </View>
+          {/* New Password Field with CustomTextInput */}
+          <CustomTextInput
+            label="New Password"
+            placeholder="Enter your New Password"
+            secureTextEntry={true}
+            value={NewPassword}
+            onChangeText={(value) => handleInputChange('NewPassword', value)}
+            error={error.includes('New Password') ? error : null}
+            returnKeyType="next"
+            onSubmitEditing={() => ReEnterpasswordInputRef.current.focus()}
+          />
 
-          {/* Confirm Password Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Confirm Password</Text>
-            <TextInput
-              ref={ReEnterpasswordInputRef}
-              placeholder="Re-enter your New Password"
-              placeholderTextColor="gray"
-              style={styles.input}
-              secureTextEntry={true}
-              value={ConfirmPassword}
-              onChangeText={(value) => handleInputChange('ConfirmPassword', value)}
-            />
-          </View>
+          {/* Confirm Password Field with CustomTextInput */}
+          <CustomTextInput
+            label="Confirm Password"
+            placeholder="Re-enter your New Password"
+            secureTextEntry={true}
+            value={ConfirmPassword}
+            onChangeText={(value) => handleInputChange('ConfirmPassword', value)}
+            error={error.includes('Confirm Password') ? error : null}
+            inputRef={ReEnterpasswordInputRef}
+            returnKeyType="done"
+            onSubmitEditing={isCheckValid}
+          />
 
           {/* Display Error Message */}
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error && !error.includes('New Password') && !error.includes('Confirm Password') && (
+            <Text style={styles.errorText}>{error}</Text>
+          )}
 
           {/* Reset Button */}
           <TouchableOpacity style={styles.button} onPress={isCheckValid}>
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F3F6',
+    backgroundColor: '#E5D9F2',
   },
   innerContainer: {
     width: '90%',
@@ -125,30 +129,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: '#6A0DAD',
     marginBottom: 40,
   },
-  inputField: {
-    marginVertical: 12,
-    width: '100%',
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
-  },
-  input: {
-    borderBottomColor: '#2980B9',
-    borderBottomWidth: 1,
-    paddingVertical: 8,
-    marginTop: 5,
-    fontSize: 16,
-    color: '#2C3E50',
-    textAlignVertical: 'center',
-    letterSpacing: 0.5,
-    paddingHorizontal: 8,
-  },
   button: {
-    backgroundColor: '#2980B9',
+    backgroundColor: '#9B59B6',
     paddingVertical: 12,
     paddingHorizontal: 60,
     borderRadius: 8,

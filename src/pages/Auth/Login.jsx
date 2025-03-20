@@ -1,6 +1,8 @@
+// Login.jsx
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomTextInput from '../../components/CustomTextInput';
 
 const Login = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +14,6 @@ const Login = ({ navigation }) => {
   const [formError, setFormError] = useState('');
 
   const { Email, Password } = formData;
-
   const passwordInputRef = React.createRef();
 
   const handleInputChange = (name, value) => {
@@ -48,21 +49,19 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      // Retrieve user data from AsyncStorage
       const storedData = await AsyncStorage.getItem('userData');
       if (storedData) {
         const parsedData = JSON.parse(storedData);
 
-        // Check if Email and password match
         if (parsedData.Email === Email.trim() && parsedData.Password === Password.trim()) {
           console.log('User logged in successfully');
-          navigation.navigate('Dashboard');  // Navigate to Profile screen after successful login
+          navigation.navigate('Dashboard');
         } else {
           setFormError('Invalid credentials. Please check your Email or Password.');
         }
       } else {
         setFormError('No account found. Please sign up first.');
-        navigation.navigate('Signup'); // Navigate to Signup screen if no account found
+        navigation.navigate('Signup');
       }
     } catch (error) {
       console.error('Error checking user data from AsyncStorage:', error);
@@ -72,59 +71,44 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
           <Text style={styles.title}>Login</Text>
 
-          {/* Email Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Email</Text>
-            <TextInput
-              placeholder="Enter your Email"
-              placeholderTextColor="gray"
-              style={[styles.input, emailError ? styles.inputError : null]}
-              value={Email}
-              onChangeText={(value) => handleInputChange('Email', value)}
-              returnKeyType="next"
-              onSubmitEditing={() => passwordInputRef.current.focus()}  // Focus to password field
-            />
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-          </View>
+          <CustomTextInput
+            label="Email"
+            value={Email}
+            onChangeText={(value) => handleInputChange('Email', value)}
+            error={emailError}
+            placeholder="Enter your Email"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordInputRef.current.focus()}
+          />
 
-          {/* Password Field */}
-          <View style={styles.inputField}>
-            <Text style={styles.inputLabel}>Password</Text>
-            <TextInput
-              ref={passwordInputRef}
-              placeholder="Enter your Password"
-              placeholderTextColor="gray"
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              secureTextEntry={true}
-              value={Password}
-              onChangeText={(value) => handleInputChange('Password', value)}
-              returnKeyType="done" // When done button is pressed, validate
-              onSubmitEditing={isCheckValid}  // Trigger form validation and login on Enter
-            />
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-          </View>
+          <CustomTextInput
+            label="Password"
+            value={Password}
+            onChangeText={(value) => handleInputChange('Password', value)}
+            error={passwordError}
+            placeholder="Enter your Password"
+            secureTextEntry={true}
+            inputRef={passwordInputRef}
+            returnKeyType="done"
+            onSubmitEditing={isCheckValid}
+          />
 
-          {/* Form Error Message */}
           {formError ? <Text style={styles.formErrorText}>{formError}</Text> : null}
 
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          {/* Login Button */}
           <TouchableOpacity style={styles.button} onPress={isCheckValid}>
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
 
-          <Text style={styles.loginText}>
+          <Text style={styles.signupText}>
             Don't have an account?{" "}
             <Text style={styles.signupLink} onPress={() => navigation.navigate('Signup')}>
               Sign Up
@@ -138,12 +122,13 @@ const Login = ({ navigation }) => {
 
 export default Login;
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F1F3F6',
+    backgroundColor: '#E5D9F2',
   },
   innerContainer: {
     width: '90%',
@@ -157,34 +142,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: '600',
-    color: '#2C3E50',
+    color: '#6A0DAD',
     marginBottom: 40,
-  },
-  inputField: {
-    marginVertical: 12,
-    width: '100%',
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
-  },
-  input: {
-    borderBottomColor: '#2980B9',
-    borderBottomWidth: 1,
-    paddingVertical: 8,
-    marginTop: 5,
-    fontSize: 16,
-    color: '#2C3E50',
-    textAlignVertical: 'center',
-    letterSpacing: 0.5,
-    paddingHorizontal: 8,
-  },
-  inputError: {
-    borderBottomColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
   },
   formErrorText: {
     color: 'red',
@@ -194,21 +153,21 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     marginTop: 15,
-    color: '#007bff',
+    color: '#9B59B6',
     fontSize: 16,
     textDecorationLine: 'underline',
   },
-  loginText: {
+  signupText: {
     marginTop: 20,
     fontSize: 16,
     color: '#7F8C8D',
   },
   signupLink: {
-    color: '#2980B9',
+    color: '#9B59B6',
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#2980B9',
+    backgroundColor: '#9B59B6',
     paddingVertical: 12,
     paddingHorizontal: 60,
     borderRadius: 8,
