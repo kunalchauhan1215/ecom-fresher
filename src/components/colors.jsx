@@ -16,6 +16,12 @@ const Colors = {
   belizeBlue: '#2980B9',      // Belize Hole blue color
   midnightBlue: '#2C3E50',    // Midnight Blue color
   grayBlue: '#7F8C8D',        // Grayish Blue color
-};
-
+  pastleGreen:'#DCF8C6'  ,    // light Green
+  lightGray:'#EAEAEA' ,       //light Gray
+  midiumLightGray:'#ccc',      // medium light gray
+  white:"#fff" ,                 //white 
+  darkGray:"#555"    ,     //dark gray
+  brightBlue: "#007bff" ,   //bright blue
+  lightPurple: "#D8BFD8",
+}
 export default Colors;
