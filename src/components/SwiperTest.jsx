@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import SwipeCards from 'react-native-swipe-cards';
-import productsData from '../pages/home/products.json'; 
+import Toast from 'react-native-toast-message';
+import productsData from '../pages/home/products.json';
 import { useNavigation } from '@react-navigation/native';
+import Colors from './colors';
 
 const Swiper = () => {
   const navigation = useNavigation();
-  const [cartItems, setCartItems] = useState([]); 
-  const [swipedCards, setSwipedCards] = useState([]); 
-  const [currentCards, setCurrentCards] = useState(productsData.products); 
+  const [cartItems, setCartItems] = useState([]);
+  const [swipedCards, setSwipedCards] = useState([]);
+  const [currentCards, setCurrentCards] = useState(productsData.products);
 
   const addToCart = (product) => {
-    setCartItems([...cartItems, product]); 
-    setSwipedCards(prevSwiped => [...prevSwiped, product]); 
-    setCurrentCards(prevCards => prevCards.slice(1)); 
-    // Alert.alert("Added to Cart", `${product.title} has been added to your cart.`);
+    setCartItems([...cartItems, product]);
+    setSwipedCards(prevSwiped => [...prevSwiped, product]);
+    setCurrentCards(prevCards => prevCards.slice(1));
+
+    Toast.show({
+      type: 'success',
+      text1: 'Added to Cart',
+      text2: `${product.title} has been added.`,
+      position: 'bottom',
+    });
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prevCart => prevCart.filter(item => item.id !== productId)); 
+  const removeFromCart = (productId, productTitle) => {
+    setCartItems(prevCart => prevCart.filter(item => item.id !== productId));
+
+    Toast.show({
+      type: 'error',
+      text1: 'Product Removed',
+      text2: `${productTitle} has been removed.`,
+      position: 'bottom',
+    });
   };
 
   const handleCartNavigation = () => {
@@ -27,18 +42,30 @@ const Swiper = () => {
 
   const restorePreviousCard = () => {
     if (swipedCards.length === 0) {
-      // Alert.alert("No Previous Products", "There are no previous products to restore.");
+      Toast.show({
+        type: 'info',
+        text1: 'No Previous Products',
+        text2: 'There are no previous products to restore.',
+        position: 'bottom',
+      });
       return;
     }
 
-    const lastSwiped = swipedCards[swipedCards.length - 1]; 
-    setSwipedCards(prevSwiped => prevSwiped.slice(0, -1)); 
+    const lastSwiped = swipedCards[swipedCards.length - 1];
+    setSwipedCards(prevSwiped => prevSwiped.slice(0, -1));
+    setCurrentCards(prevCards => [lastSwiped, ...prevCards]);
 
-    setCurrentCards(prevCards => [lastSwiped, ...prevCards]); 
+    Toast.show({
+      type: 'info',
+      text1: 'Restored Product',
+      text2: `${lastSwiped.title} has been restored.`,
+      position: 'bottom',
+    });
   };
 
   const handleSwipeLeft = (product) => {
-    removeFromCart(product.id);
+    removeFromCart(product.id, product.title);
+    
   };
 
   const renderCard = (product) => {
@@ -69,10 +96,10 @@ const Swiper = () => {
         cards={currentCards}
         renderCard={renderCard}
         renderNoMoreCards={renderNoMoreCards}
-        handleYup={addToCart} 
-        handleNope={handleSwipeLeft} 
+        handleYup={addToCart}
+        handleNope={handleSwipeLeft}
       />
-      
+
       <View style={styles.buttonRow}>
         <TouchableOpacity onPress={restorePreviousCard} style={styles.previousButton}>
           <Text style={styles.previousButtonText}>Previous</Text>
@@ -84,6 +111,9 @@ const Swiper = () => {
           <Text style={styles.cartButtonText}>View Cart ({cartItems.length})</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Toast Notification Component */}
+      <Toast />
     </View>
   );
 };
@@ -92,7 +122,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'white', 
+    backgroundColor: 'white',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -101,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   previousButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 20,
     alignItems: 'center',
@@ -119,7 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   detailsButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 20,
     alignItems: 'center',
@@ -127,7 +157,7 @@ const styles = StyleSheet.create({
     width: '30%',
   },
   cartButton: {
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 30,
     alignItems: 'center',
@@ -170,7 +200,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonCart: {
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.primary,
     padding: 8,
     borderRadius: 20,
     flex: 1,

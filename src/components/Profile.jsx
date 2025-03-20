@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
+import Colors from '../../components/colors';
+
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -18,7 +20,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(true);
   const [errors, setErrors] = useState({});
 
-  
+  // Create refs for each input field
   const emailInputRef = useRef(null);
   const phoneInputRef = useRef(null);
   const ageInputRef = useRef(null);
@@ -143,7 +145,7 @@ const Profile = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>{isEditing ? 'Edit Profile' : 'Profile'}</Text>
 
       <TouchableOpacity onPress={handleImagePicker}>
@@ -260,13 +262,13 @@ const Profile = () => {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1, // Allow the ScrollView to grow
     padding: 20,
     alignItems: 'center',
     backgroundColor: '#fff',
@@ -275,6 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color:Colors.primary
   },
   profileImage: {
     width: 150,
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: '#6366f1',
+    backgroundColor:Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -332,19 +335,19 @@ const styles = StyleSheet.create({
   },
   selectedRadio: {
     fontWeight: 'bold',
-    color: 'blue',
+    color: Colors.primary,
   },
   checkboxContainer: {
     marginVertical: 10,
   },
   button: {
-    backgroundColor: '#6366f1',
+    backgroundColor: Colors.primary,
     padding: 12,
     alignItems: 'center',
     borderRadius: 5,
   },
   savedButton: {
-    backgroundColor: '#6366f1', // Green color for the saved button
+    backgroundColor: Colors.primary, 
   },
   buttonText: {
     color: '#fff',
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     marginTop: 20,
     padding: 12,
-    backgroundColor: '#6366f1',
+    backgroundColor:Colors.primary,
     borderRadius: 5,
   },
   logoutButtonText: {

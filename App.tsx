@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 
 // Import your components and pages
 import Login from './src/pages/Auth/Login';
@@ -14,8 +15,9 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
   return (
+    <>
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="SwiperTest">
+      <Stack.Navigator initialRouteName="Login">
         {/* Auth screens */}
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Signup" component={Signup} />
@@ -27,6 +29,9 @@ const App = () => {
         <Stack.Screen name="Profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
+
+    <Toast />
+    </>
   );
 };
 
