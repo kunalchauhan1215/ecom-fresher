@@ -86,12 +86,11 @@ const Stack = createStackNavigator();
 
 const AuthNavigation = () => {
   return (
-    <Stack.Navigator  initialRouteName="Login" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="AppNavigation" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
-   <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-    <Stack.Screen name="ResetPassword" component={ResetPassword} />
-
+      <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      <Stack.Screen name="ResetPassword" component={ResetPassword} />
       <Stack.Screen name="AppNavigation" component={AppNavigation} />
     </Stack.Navigator>
   );

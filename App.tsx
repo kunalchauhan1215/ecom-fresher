@@ -103,11 +103,19 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AuthNavigation from './src/routes/AuthRoutes/AuthNavigation';
 
+import { PersistGate } from 'redux-persist/integration/react'
+import { Provider } from 'react-redux';
+import { persistor, store } from './src/redux/store/Store';
 const App = () => {
   return (
-    <NavigationContainer>
-      <AuthNavigation />
-    </NavigationContainer>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <NavigationContainer>
+          <AuthNavigation />
+        </NavigationContainer>
+      </PersistGate>
+    </Provider>
+
   );
 };
 
