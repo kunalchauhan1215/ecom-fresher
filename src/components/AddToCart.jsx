@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 'semibold',
-    paddingHorizontal:3
+    paddingHorizontal: 3,
   },
 });

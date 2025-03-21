@@ -8,9 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import AddToCart from '../../components/AddToCart';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   clearCart,
@@ -18,6 +17,7 @@ import {
   deleteFromCart,
   increaseQuantity,
 } from '../../redux/modules/cart/cartSlice';
+import RazorpayCheckout from 'react-native-razorpay';
 
 // const Home = ({userdata}) => {
 const Cart = () => {
@@ -41,6 +41,39 @@ const Cart = () => {
       total = total + item.quantity;
     });
     return total;
+  };
+  const RAZOR_PAY_KEY_ID = 'rzp_test_5OVlZZrtAotZUi';
+  const RAZOR_PAY_KEY_SECRET = '7wF2Osy6TMtM0GREP8XqxhNm';
+  const rupeeAmount = (getTotalPrice() * 100).toFixed(2);
+
+  const handleCheckOut = () => {
+    var options = {
+      description: 'Credits towards consultation',
+      image: 'https://i.imgur.com/3g7nmJC.jpg',
+      currency: 'INR',
+      key: RAZOR_PAY_KEY_ID,
+      amount: rupeeAmount,
+      name: 'Ecom App',
+      order_id: '', //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: 'gaurav.kumar@example.com',
+        contact: '9191919191',
+        name: 'Gaurav Kumar',
+      },
+      theme: {color: '#53a20e'},
+      padding: 20,
+    };
+    RazorpayCheckout.open(options)
+      .then(data => {
+        // handle success
+        alert(`Success: ${data.razorpay_payment_id}`);
+        dispatch(clearCart());
+      })
+      .catch(error => {
+        // handle failure
+        alert(`Error: ${error.code} | ${error.description}`);
+      });
+      
   };
 
   const renderItems = ({item}) => (
@@ -97,7 +130,7 @@ const Cart = () => {
     <SafeAreaView style={{flex: 1}}>
       {/* <Text style={styles.productHeading}>Products from cart</Text> */}
 
-      {cartData ? (
+      {cartData.length > 0 ? (
         <View style={{flex: 1}}>
           <FlatList
             data={cartData}
@@ -106,21 +139,37 @@ const Cart = () => {
           />
         </View>
       ) : (
-        'no item in the cart'
+        <View style={{flex: 1, alignItems: 'center' ,justifyContent:'center'}}>
+          <Text style={styles.title} >
+            {' '}
+            no item in the cart
+          </Text>
+        </View>
       )}
+      
       <View style={styles.bottomBar}>
         {getTotalQuantity() > 0 ? (
           <View>
             <Text style={styles.title}>
               TotalQuantity: {getTotalQuantity()}
             </Text>
-            <Text style={styles.title}>TotalPrice: ${getTotalPrice()}</Text>
+            <Text style={styles.title}>TotalPrice: Rs.{rupeeAmount}</Text>
           </View>
         ) : (
           <Text style={styles.title}>No Item In the Cart</Text>
         )}
         <View>
-          <Button title="checkout"></Button>
+          {getTotalQuantity() > 0 && (
+            <TouchableOpacity
+              onPress={() => handleCheckOut()}
+              style={
+                getTotalQuantity() > 0
+                  ? styles.CheckOutButtonActive
+                  : styles.CheckOutButtonDisable
+              }>
+              <Text style={styles.CheckOutText}>Checkout</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -281,5 +330,28 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     objectFit: 'cover',
     tintColor: 'white',
+  },
+  CheckOutButtonActive: {
+    backgroundColor: 'purple',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+  },
+  CheckOutButtonDisable: {
+    backgroundColor: 'gray',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+  },
+  CheckOutText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

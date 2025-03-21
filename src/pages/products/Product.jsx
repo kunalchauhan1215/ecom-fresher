@@ -118,7 +118,7 @@ const Product = () => {
           />
         </SafeAreaView>
       ) : (
-        'no products found'
+        <Text>no products found</Text>
       )}
     </View>
   );
@@ -265,9 +265,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     position: 'absolute',
     top: 10,
-    right:10,
+    right: 10,
   },
-  list:{
-    marginBottom:15
-  }
+  list: {
+    marginBottom: 15,
+  },
 });

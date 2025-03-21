@@ -30,7 +30,9 @@ const RouteManager = () => {
                 style={styles.cartImage}
                 source={require('../assests/icons/shopping-cart.png')}
               />
-              {getTotalQuantity() > 0 && <Text style={styles.cartQuantity}>{getTotalQuantity()}</Text>}
+              {getTotalQuantity() > 0 && (
+                <Text style={styles.cartQuantity}>{getTotalQuantity()}</Text>
+              )}
             </TouchableOpacity>
           ),
         })}>
@@ -38,7 +40,6 @@ const RouteManager = () => {
         <Stack.Screen name="product" component={Product} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Details" component={Details} />
-        {/* <Stack.Screen name="addToCart" component={AddToCart} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

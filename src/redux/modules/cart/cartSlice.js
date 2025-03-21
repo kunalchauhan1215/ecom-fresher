@@ -38,7 +38,7 @@ const cartSlice = createSlice({
     },
     clearCart: state => {
       state.cart = [];
-      Alert.alert('cart is empty');
+      // Alert.alert('cart is empty');
     },
     deleteFromCart:(state, action)=>{
       state.cart = state.cart.filter(item => item.id !== action.payload);
