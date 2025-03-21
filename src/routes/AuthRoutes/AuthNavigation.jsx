@@ -14,7 +14,7 @@ const Stack = createStackNavigator();
 const AuthNavigation = () => {
   return (
     <>
-      <NavigationContainer>
+  
         <Stack.Navigator initialRouteName="AppNavigation">
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />
@@ -22,7 +22,7 @@ const AuthNavigation = () => {
           <Stack.Screen name="ResetPassword" component={ResetPassword} />
           <Stack.Screen name="AppNavigation" component={AppNavigation} options={{ headerShown: false }} />
         </Stack.Navigator>
-      </NavigationContainer>
+     
 
       {/* Toast Component */}
       <Toast />
