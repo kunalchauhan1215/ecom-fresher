@@ -11,12 +11,19 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Colors from "../../components/colors";
 
 const ChatScreen = () => {
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState({});
   const [currentComment, setCurrentComment] = useState("");
   const [replyTo, setReplyTo] = useState(null);
+  const [activeUserId, setActiveUserId] = useState(null);
 
-  const handleLike = (commentId, replyId = null) => {
-    const updatedComments = comments.map((comment) => {
+  const users = [
+    { id: 1, name: "User A" },
+    { id: 2, name: "User B" },
+    { id: 3, name: "User C" },
+  ];
+
+  const handleLike = (userId, commentId, replyId = null) => {
+    const updatedComments = comments[userId].map((comment) => {
       if (comment.id === commentId) {
         if (replyId) {
           const updatedReplies = comment.replies.map((reply) =>
@@ -30,51 +37,30 @@ const ChatScreen = () => {
       }
       return comment;
     });
-    setComments(updatedComments);
+
+    setComments({ ...comments, [userId]: updatedComments });
   };
 
   const handleSend = () => {
     if (currentComment.trim() === "") return;
 
-    const lowerText = currentComment.toLowerCase();
-    let autoReply = null;
-
-    // Basic sentiment analysis
-    if (
-      lowerText.includes("great") ||
-      lowerText.includes("good") ||
-      lowerText.includes("amazing") ||
-      lowerText.includes("very adorable")
-    ) {
-      autoReply = "Thank you for your positive feedback!";
-    } else if (
-      lowerText.includes("bad") ||
-      lowerText.includes("poor") ||
-      lowerText.includes("terrible") ||
-      lowerText.includes("worst")
-    ) {
-      autoReply = "We're sorry to hear about your experience. We'll strive to improve.";
-    }
-
+    const userComments = comments[activeUserId] || [];
     let updatedComments;
+
     if (replyTo) {
-      updatedComments = comments.map((comment) =>
+      updatedComments = userComments.map((comment) =>
         comment.id === replyTo
           ? {
               ...comment,
               replies: [
                 ...comment.replies,
                 { id: Date.now(), text: currentComment, likes: 0 },
-                ...(autoReply
-                  ? [
-                      {
-                        id: Date.now() + 1,
-                        text: autoReply,
-                        likes: 0,
-                        isAutoReply: true,
-                      },
-                    ]
-                  : []),
+                {
+                  id: Date.now() + 1,
+                  text: null, // Auto-reply has no text
+                  likes: 0,
+                  isAutoReply: true,
+                },
               ],
             }
           : comment
@@ -85,21 +71,19 @@ const ChatScreen = () => {
         id: Date.now(),
         text: currentComment,
         likes: 0,
-        replies: autoReply
-          ? [
-              {
-                id: Date.now() + 1,
-                text: autoReply,
-                likes: 0,
-                isAutoReply: true,
-              },
-            ]
-          : [],
+        replies: [
+          {
+            id: Date.now() + 1,
+            text: null,
+            likes: 0,
+            isAutoReply: true,
+          },
+        ],
       };
-      updatedComments = [...comments, newComment];
+      updatedComments = [...userComments, newComment];
     }
 
-    setComments(updatedComments);
+    setComments({ ...comments, [activeUserId]: updatedComments });
     setCurrentComment("");
   };
 
@@ -109,7 +93,7 @@ const ChatScreen = () => {
         <Text style={styles.commentText}>{item.text}</Text>
         <View style={styles.actionRow}>
           <TouchableOpacity
-            onPress={() => handleLike(item.id)}
+            onPress={() => handleLike(activeUserId, item.id)}
             style={styles.likeButton}
           >
             <MaterialIcons name="thumb-up" size={16} color={Colors.accent} />
@@ -126,28 +110,25 @@ const ChatScreen = () => {
       {item.replies.length > 0 && (
         <View style={styles.replyContainer}>
           {item.replies.map((reply) => (
-            <View
-              key={reply.id}
-              style={[
-                styles.replyBubble,
-                reply.isAutoReply && styles.autoReplyBubble,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.replyText,
-                  reply.isAutoReply && { color: Colors.lightBlue },
-                ]}
-              >
-                {reply.text}
-              </Text>
-              <TouchableOpacity
-                onPress={() => handleLike(item.id, reply.id)}
-                style={styles.likeButton}
-              >
-                <MaterialIcons name="thumb-up" size={14} color={Colors.accent} />
-                <Text style={styles.likeCount}>{reply.likes}</Text>
-              </TouchableOpacity>
+            <View key={reply.id} style={styles.replyBubble}>
+              {reply.text ? (
+                <Text style={styles.replyText}>{reply.text}</Text>
+              ) : (
+                // Auto-reply with like button and input field
+                <View style={styles.autoReplyContainer}>
+                  <TouchableOpacity
+                    onPress={() => handleLike(activeUserId, item.id, reply.id)}
+                    style={styles.likeButton}
+                  >
+                    <MaterialIcons name="thumb-up" size={14} color={Colors.accent} />
+                    <Text style={styles.likeCount}>{reply.likes}</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.autoReplyInput}
+                    placeholder="Write a reply..."
+                  />
+                </View>
+              )}
             </View>
           ))}
         </View>
@@ -157,28 +138,64 @@ const ChatScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={comments}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderComment}
-        contentContainerStyle={styles.commentList}
-      />
-      <View style={styles.inputContainer}>
-        {replyTo && (
-          <Text style={styles.replyToText}>
-            Replying to: {comments.find((comment) => comment.id === replyTo)?.text}
-          </Text>
-        )}
-        <TextInput
-          style={styles.input}
-          value={currentComment}
-          onChangeText={setCurrentComment}
-          placeholder={replyTo ? "Reply to a comment..." : "Add a comment..."}
+      {activeUserId ? (
+        <>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => setActiveUserId(null)}
+              style={styles.closeButton}
+            >
+              <MaterialIcons name="arrow-back" size={24} color={Colors.white} />
+              <Text style={styles.closeButtonText}>Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>
+              Chat with {users.find((user) => user.id === activeUserId)?.name}
+            </Text>
+          </View>
+          <FlatList
+            data={comments[activeUserId] || []}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderComment}
+            contentContainerStyle={styles.commentList}
+          />
+          <View style={styles.inputContainer}>
+            {replyTo && (
+              <Text style={styles.replyToText}>
+                Replying to:{" "}
+                {comments[activeUserId]?.find((comment) => comment.id === replyTo)
+                  ?.text}
+              </Text>
+            )}
+            <TextInput
+              style={styles.input}
+              value={currentComment}
+              onChangeText={setCurrentComment}
+              placeholder={
+                replyTo ? "Reply to a comment..." : "Add a comment..."
+              }
+            />
+            {currentComment.trim() !== "" && (
+              <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+                <MaterialIcons name="send" size={20} color="white" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </>
+      ) : (
+        <FlatList
+          data={users}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.userItem}
+              onPress={() => setActiveUserId(item.id)}
+            >
+              <Text style={styles.userName}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.userList}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-          <MaterialIcons name="send" size={20} color="white" />
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 };
@@ -188,77 +205,73 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surfaceLight,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: Colors.accent,
+  },
+  closeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  closeButtonText: {
+    marginLeft: 5,
+    color: Colors.white,
+    fontSize: 16,
+  },
+  headerTitle: {
+    marginLeft: 15,
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  userList: {
+    padding: 10,
+  },
+  userItem: {
+    padding: 15,
+    backgroundColor: Colors.lightGray,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  userName: {
+    color: Colors.textDark,
+    fontSize: 16,
+  },
   commentList: {
     padding: 10,
   },
-  commentContainer: {
-    marginBottom: 15,
-  },
-  commentBubble: {
-    backgroundColor: Colors.lightGray,
-    padding: 10,
-    borderRadius: 10,
-    maxWidth: "90%",
-  },
-  commentText: {
-    color: Colors.textDark,
-  },
-  actionRow: {
-    flexDirection: "row",
-    marginTop: 5,
-    alignItems: "center",
-  },
-  likeButton: {
+  autoReplyContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 15,
-  },
-  likeCount: {
-    marginLeft: 5,
-    color: Colors.textDark,
-  },
-  replyButtonText: {
-    color: Colors.textDark,
-  },
-  replyContainer: {
     marginTop: 5,
-    paddingLeft: 20,
   },
-  replyBubble: {
-    backgroundColor: Colors.lightGray,
-    padding: 5,
+  autoReplyInput: {
+    flex: 1,
+    backgroundColor: Colors.white,
     borderRadius: 10,
-    marginBottom: 2,
-  },
-  autoReplyBubble: {
-    backgroundColor: Colors.surfaceLight,
-    borderLeftWidth: 2,
-    borderLeftColor: Colors.accent,
-  },
-  replyText: {
-    color: Colors.lightPurple,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: Colors.lightGray,
+    marginLeft: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    borderTopWidth: 1,
-    borderColor: Colors.lightGray,
-  },
-  replyToText: {
-    color: Colors.accent,
-    marginBottom: 5,
-    fontStyle: "italic",
+    padding: 15, 
+    backgroundColor: Colors.surfaceLight, 
+    borderTopWidth: 1, 
+    borderColor: Colors.lightGray, 
   },
   input: {
     flex: 1,
-    backgroundColor: Colors.white,
-    borderRadius: 25,
-    paddingVertical: 8,
+    backgroundColor: Colors.surfaceLight,
+    borderRadius: 20,
     paddingHorizontal: 15,
+    paddingVertical: 8,
     borderWidth: 1,
     borderColor: Colors.lightGray,
-    marginRight: 10,
   },
   sendButton: {
     backgroundColor: Colors.accent,
@@ -266,6 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 10, 
   },
 });
 
