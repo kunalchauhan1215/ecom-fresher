@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Home from '../../pages/home/Home';
 import Searching from '../../pages/home/Searching';
@@ -11,6 +11,8 @@ import Profile from '../../pages/home/Profile';
 import Settings from '../../pages/home/Settings';
 import AddProduct from '../../pages/home/AddProduct';
 import SwiperTest from '../../pages/home/SwiperTest';
+import { useSelector } from 'react-redux';
+import Cart from '../../pages/cartPage/Cart';
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -93,6 +95,15 @@ const SwiperTestScreen = ({ navigation }) => <TabNavigator initialRoute="SwiperT
 // Drawer Navigator with all screens
 const AppNavigation = () => {
   const [selectedTab, setSelectedTab] = useState('Home');
+  const cartData = useSelector(state => state.cart?.cart);
+
+  const getTotalQuantity = () => {
+    let total = 0;
+    cartData.map(item => {
+      total = total + item.quantity;
+    });
+    return total;
+  };
 
   const handleTabChange = (route) => {
     setSelectedTab(route);
@@ -101,12 +112,34 @@ const AppNavigation = () => {
   return (
     <Drawer.Navigator
       initialRouteName="Home"
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
+        // Customizing the drawer options
         drawerActiveTintColor: '#ffffff', 
         drawerActiveBackgroundColor: '#6366f1', 
         headerTitle: '',
         headerShown: true,
-      }}
+        headerRight: () => (
+          <TouchableOpacity 
+          style={styles.cartContainer} 
+          onPress={() => navigation.navigate('cart')}
+        >
+          <Image
+            style={styles.cartImage}
+            source={require('../../assets/icons/shopping-cart.png')}
+          />
+          {getTotalQuantity() > 0 && (
+            <Text style={styles.cartQuantity}>{getTotalQuantity()}</Text>
+          )}
+        </TouchableOpacity>
+        ),
+      })}
+    //   screenOptions={{
+    //     drawerActiveTintColor: '#ffffff', 
+    //     drawerActiveBackgroundColor: '#6366f1', 
+    //     headerTitle: '',
+    //     headerShown: true,
+    //   }
+    // }
     >
       <Drawer.Screen
         name="Home"
@@ -173,8 +206,9 @@ const AppNavigation = () => {
       ),
       onPress: () => handleTabChange('SwiperTest'),
     }}
-  />
+  /> 
 </Drawer.Navigator>
+
 );
 };
 const styles = StyleSheet.create({
@@ -197,6 +231,28 @@ fontSize: 12,
 fontFamily: 'Inter-Medium',
 paddingBottom: 6,
 marginTop: -4,
+},
+cartContainer: {
+  marginRight: 30,  // Moves the icon away from the edge
+  position: 'relative',  // Keeps the quantity number positioned correctly
+},
+cartImage: {
+  width: 30,
+  height: 30,
+  tintColor: '#800080', // Adjust icon color if needed
+},
+cartQuantity: {
+  position: 'absolute',
+  top: -5,
+  right: -5,
+  backgroundColor: 'red',
+  color: 'white',
+  borderRadius: 10,
+  width: 18,
+  height: 18,
+  textAlign: 'center',
+  fontSize: 12,
+  fontWeight: 'bold',
 },
 });
 export default AppNavigation;

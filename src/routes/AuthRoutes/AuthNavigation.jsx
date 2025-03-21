@@ -81,6 +81,7 @@ import AppNavigation from '../AppRoutes/AppNavigation';
 import Signup from '../../pages/Auth/Signup';
 import ForgotPassword from '../../pages/Auth/ForgotPassword';
 import ResetPassword from '../../pages/Auth/ResetPassword';
+import Cart from '../../pages/cartPage/Cart';
 
 const Stack = createStackNavigator();
 
@@ -92,6 +93,7 @@ const AuthNavigation = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       <Stack.Screen name="ResetPassword" component={ResetPassword} />
       <Stack.Screen name="AppNavigation" component={AppNavigation} />
+      {/* <Stack.Screen name="cart" component={Cart} /> */}
     </Stack.Navigator>
   );
 };
